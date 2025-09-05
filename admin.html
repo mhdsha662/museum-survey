@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qatar Museums Survey - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #5E8AB4;
+            --bg: #FBF6ED;
+        }
+        
+        body {
+            background-color: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .admin-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background: #4D7A94;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .input-field {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 12px;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        
+        .input-field:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(94, 138, 180, 0.1);
+        }
+        
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), #7EB9D3);
+            color: white;
+            border-radius: 12px;
+            padding: 24px;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Qatar Museums Survey</h1>
+            <p class="text-gray-600">Admin Dashboard</p>
+        </div>
+
+        <!-- Authentication -->
+        <div id="auth-section" class="admin-card p-6 mb-8 max-w-md mx-auto">
+            <h2 class="text-xl font-bold mb-4">Admin Login</h2>
+            <div class="space-y-4">
+                <input type="password" id="admin-password" class="input-field" placeholder="Enter admin password">
+                <button id="login-btn" class="btn-primary w-full">Login</button>
+            </div>
+        </div>
+
+        <!-- Dashboard (hidden initially) -->
+        <div id="dashboard" class="hidden">
+            <!-- Stats Cards -->
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="stat-card text-center">
+                    <i class="fas fa-chart-bar text-3xl mb-2"></i>
+                    <div class="text-2xl font-bold" id="total-responses">-</div>
+                    <div class="text-sm opacity-90">Total Responses</div>
+                </div>
+                <div class="stat-card text-center">
+                    <i class="fas fa-globe text-3xl mb-2"></i>
+                    <div class="text-2xl font-bold" id="english-responses">-</div>
+                    <div class="text-sm opacity-90">English Responses</div>
+                </div>
+                <div class="stat-card text-center">
+                    <i class="fas fa-language text-3xl mb-2"></i>
+                    <div class="text-2xl font-bold" id="arabic-responses">-</div>
+                    <div class="text-sm opacity-90">Arabic Responses</div>
+                </div>
+            </div>
+
+            <!-- Export Section -->
+            <div class="admin-card p-6 mb-8">
+                <h2 class="text-xl font-bold mb-4">Export Data</h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Basic Export -->
+                    <div>
+                        <h3 class="font-semibold mb-3">Quick Export</h3>
+                        <div class="space-y-3">
+                            <button id="export-all" class="btn-primary w-full">
+                                <i class="fas fa-download mr-2"></i>
+                                Download All Data
+                            </button>
+                            <button id="export-english" class="btn-secondary w-full">
+                                <i class="fas fa-download mr-2"></i>
+                                English Only
+                            </button>
+                            <button id="export-arabic" class="btn-secondary w-full">
+                                <i class="fas fa-download mr-2"></i>
+                                Arabic Only
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Export -->
+                    <div>
+                        <h3 class="font-semibold mb-3">Custom Export</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Start Date</label>
+                                <input type="date" id="start-date" class="input-field">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">End Date</label>
+                                <input type="date" id="end-date" class="input-field">
+                            </div>
+                            <button id="export-custom" class="btn-primary w-full">
+                                <i class="fas fa-filter mr-2"></i>
+                                Export Filtered Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Submissions -->
+            <div class="admin-card p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">Recent Submissions</h2>
+                    <button id="refresh-data" class="btn-secondary">
+                        <i class="fas fa-refresh mr-2"></i>
+                        Refresh
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-3 px-2">Date</th>
+                                <th class="text-left py-3 px-2">Language</th>
+                                <th class="text-left py-3 px-2">Score</th>
+                                <th class="text-left py-3 px-2">Visit Reason</th>
+                                <th class="text-left py-3 px-2">Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody id="submissions-table">
+                            <tr>
+                                <td colspan="5" class="text-center py-8 text-gray-500">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>
+                                    Loading data...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white rounded-lg p-6 text-center">
+                <i class="fas fa-spinner fa-spin text-3xl text-blue-500 mb-4"></i>
+                <div class="text-lg font-semibold">Preparing download...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isAuthenticated = false;
+        let adminPassword = '';
+
+        // DOM Elements
+        const authSection = document.getElementById('auth-section');
+        const dashboard = document.getElementById('dashboard');
+        const loginBtn = document.getElementById('login-btn');
+        const passwordInput = document.getElementById('admin-password');
+        const loadingOverlay = document.getElementById('loading-overlay');
+
+        // Authentication
+        loginBtn.addEventListener('click', handleLogin);
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
+
+        async function handleLogin() {
+            const password = passwordInput.value;
+            if (!password) {
+                alert('Please enter the admin password');
+                return;
+            }
+
+            loginBtn.textContent = 'Logging in...';
+            loginBtn.disabled = true;
+
+            try {
+                // Test authentication by making a request
+                const response = await fetch(`/.netlify/functions/exportCSV?password=${password}&test=true`);
+                
+                if (response.status === 401) {
+                    throw new Error('Invalid password');
+                }
+
+                // Success
+                isAuthenticated = true;
+                adminPassword = password;
+                authSection.classList.add('hidden');
+                dashboard.classList.remove('hidden');
+                
+                // Load initial data
+                loadDashboardData();
+
+            } catch (error) {
+                alert('Invalid password. Please try again.');
+            } finally {
+                loginBtn.textContent = 'Login';
+                loginBtn.disabled = false;
+            }
+        }
+
+        // Dashboard Data Loading
+        async function loadDashboardData() {
+            try {
+                // This would require an additional endpoint to get stats
+                // For now, we'll show placeholder data
+                document.getElementById('total-responses').textContent = 'Loading...';
+                document.getElementById('english-responses').textContent = 'Loading...';
+                document.getElementById('arabic-responses').textContent = 'Loading...';
+
+                // Load recent submissions table
+                loadRecentSubmissions();
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        async function loadRecentSubmissions() {
+            const tbody = document.getElementById('submissions-table');
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-500">No recent submissions data available via current API</td></tr>';
+        }
+
+        // Export Functions
+        document.getElementById('export-all').addEventListener('click', () => exportData());
+        document.getElementById('export-english').addEventListener('click', () => exportData('en'));
+        document.getElementById('export-arabic').addEventListener('click', () => exportData('ar'));
+        document.getElementById('export-custom').addEventListener('click', exportCustomData);
+        document.getElementById('refresh-data').addEventListener('click', loadDashboardData);
+
+        async function exportData(language = null) {
+            if (!isAuthenticated) return;
+
+            showLoading();
+            
+            try {
+                let url = `/.netlify/functions/exportCSV?password=${adminPassword}`;
+                if (language) {
+                    url += `&language=${language}`;
+                }
+
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error('Export failed');
+                }
+
+                // Create download
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                
+                // Get filename from response headers or generate one
+                const contentDisposition = response.headers.get('content-disposition');
+                let filename = 'qatar_museums_survey.csv';
+                if (contentDisposition) {
+                    const matches = /filename="([^"]*)"/.exec(contentDisposition);
+                    if (matches) filename = matches[1];
+                }
+                
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(downloadUrl);
+
+                // Show success message
+                showNotification('Export completed successfully!', 'success');
+
+            } catch (error) {
+                console.error('Export error:', error);
+                showNotification('Export failed. Please try again.', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function exportCustomData() {
+            if (!isAuthenticated) return;
+
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+
+            if (!startDate && !endDate) {
+                alert('Please select at least one date filter');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                let url = `/.netlify/functions/exportCSV?password=${adminPassword}`;
+                if (startDate) url += `&start_date=${startDate}`;
+                if (endDate) url += `&end_date=${endDate}`;
+
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error('Export failed');
+                }
+
+                // Create download
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                
+                const contentDisposition = response.headers.get('content-disposition');
+                let filename = 'qatar_museums_survey_filtered.csv';
+                if (contentDisposition) {
+                    const matches = /filename="([^"]*)"/.exec(contentDisposition);
+                    if (matches) filename = matches[1];
+                }
+                
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(downloadUrl);
+
+                showNotification('Custom export completed successfully!', 'success');
+
+            } catch (error) {
+                console.error('Export error:', error);
+                showNotification('Export failed. Please try again.', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Utility Functions
+        function showLoading() {
+            loadingOverlay.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 ${
+                type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Set default end date to today
+        document.getElementById('end-date').value = new Date().toISOString().split('T')[0];
+    </script>
+</body>
+</html>

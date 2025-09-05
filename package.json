@@ -1,0 +1,13 @@
+{
+  "name": "qatar-museums-survey",
+  "version": "1.0.0",
+  "description": "Qatar Museums Survey with Supabase and CSV export functionality",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'No build step required'"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.0"
+  },
+  "devDependencies": {}
+}

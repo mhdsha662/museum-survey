@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qatar Museums Survey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+        
+        :root {
+            --primary: #5E8AB4;
+            --bg: #FBF6ED;
+            --text: #000000;
+        }
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+        
+        .rtl {
+            direction: rtl;
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        .score-badge {
+            background: linear-gradient(135deg, #5E8AB4, #4D7A94);
+            box-shadow: 0 4px 15px rgba(94, 138, 180, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .score-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(94, 186, 180, 0.6);
+        }
+        
+        .progress-bar {
+            height: 10px;
+            border-radius: 5px;
+            background-color: #E0E0E0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #5E8AB4, #7EB9D3);
+            transition: width 0.5s ease;
+        }
+        
+        .question-card {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .question-card:hover {
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .option-btn {
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .option-btn.selected {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .rating-btn {
+            width: 40px;
+            height: 40px;
+            transition: all 0.2s ease;
+        }
+        
+        .rating-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .rating-btn.selected {
+            background-color: var(--primary);
+            color: white;
+            transform: scale(1.15);
+            box-shadow: 0 0 15px rgba(94, 186, 180, 0.6);
+        }
+        
+        .chatbot-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 64px;
+            height: 64px;
+            border-radius: 14px;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none;
+            cursor: pointer;
+            transition: transform .18s ease, filter .18s ease;
+            z-index: 1100;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            overflow: visible;
+            outline: none;
+        }
+
+        .chatbot-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01));
+            pointer-events: none;
+        }
+
+        .chatbot-btn:hover,
+        .chatbot-btn:focus {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: none;
+        }
+
+        .chatbot-btn:focus {
+            outline: 3px solid rgba(94,138,180,0.08);
+        }
+
+        .chatbot-btn i {
+            font-size: 22px;
+            line-height: 1;
+            filter: none;
+            transform: translateY(1px);
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .animate-gradient {
+            background-size: 200% 200%;
+            animation: gradient 10s ease infinite;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(94, 138, 180, 0.6); }
+            50% { box-shadow: 0 0 20px rgba(94, 138, 180, 0.9); }
+            100% { box-shadow: 0 0 5px rgba(94, 138, 180, 0.6); }
+        }
+        
+        .glow-animation {
+            animation: glow 2s infinite;
+        }
+        
+        .input-field {
+            transition: all 0.3s ease;
+            border: 1px solid #ddd;
+        }
+        
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(94, 138, 180, 0.2);
+        }
+        
+        .floating-label {
+            transition: all 0.3s ease;
+            transform-origin: left top;
+        }
+        
+        .input-field:focus + .floating-label,
+        .input-field:not(:placeholder-shown) + .floating-label {
+            transform: translateY(-20px) scale(0.85);
+            color: var(--primary);
+        }
+        
+        .rtl .input-field:focus,
+        .rtl .input-field:not(:placeholder-shown) + .floating-label {
+            transform-origin: right top;
+            transform: translateY(-20px) scale(0.85);
+        }
+
+        .goog-te-banner-frame.skiptranslate { display: none !important; }
+        body { top: 0 !important; }
+
+        #google_translate_container .goog-te-gadget-simple {
+          border-radius: 9999px;
+          padding: 6px 10px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+          background: #fff;
+        }
+        #google_translate_container .goog-te-gadget-simple span,
+        #google_translate_container .goog-te-gadget-simple a {
+          text-decoration: none;
+          font-weight: 500;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="confetti" id="confetti-container"></div>
+    
+    <!-- Google Translate dropdown -->
+    <div id="google_translate_container" class="fixed top-4 right-4 z-50">
+        <div id="google_translate_element"></div>
+    </div>
+    
+    <!-- Score Badge -->
+    <div class="fixed top-4 left-4 z-50">
+        <div class="score-badge rounded-full px-4 py-2 text-white font-bold flex items-center">
+            <i class="fas fa-star mr-2"></i>
+            <span id="score">0</span>
+        </div>
+    </div>
+    
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 py-20 max-w-3xl">
+        <!-- Progress Bar -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-2">
+                <span id="progress-text" class="text-sm font-medium">Question 1 of 11</span>
+                <span id="progress-percent" class="text-sm font-medium">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <!-- Survey Content -->
+        <div id="survey-container" class="question-card bg-white rounded-xl p-6 mb-8">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+        
+        <!-- Language Selection Screen -->
+        <div id="language-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-[#5E8AB4] to-[#7EB9D3] animate-gradient">
+            <div class="max-w-md w-full px-4 space-y-6">
+                <div class="text-center mb-8">
+                    <h1 class="text-3xl font-bold text-white mb-2">Qatar Museums Survey</h1>
+                    <p class="text-white/80">Please select your preferred language</p>
+                </div>
+                <button id="select-english" class="w-full py-6 rounded-xl bg-[#5E8AB4] text-white text-2xl font-bold shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300">
+                    English
+                </button>
+                <button id="select-arabic" class="w-full py-6 rounded-xl bg-[#FBF6ED] text-black text-2xl font-bold shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300">
+                    العربية
+                </button>
+            </div>
+        </div>
+        
+        <!-- Navigation Buttons -->
+        <div class="flex justify-between">
+            <button id="prev-btn" class="px-6 py-2 rounded-lg border border-[#5E8AB4] text-[#5E8AB4] font-medium hover:bg-[#5E8AB4] hover:text-white transition">
+                <i class="fas fa-arrow-left mr-2"></i>
+                <span id="prev-text">Previous</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Chatbot Button -->
+    <div class="chatbot-btn glow-animation" id="botpress-btn" role="button" aria-label="Open chat" tabindex="0">
+        <i class="fas fa-robot text-2xl"></i>
+    </div>
+    
+    <!-- Chatbot Modal -->
+    <div id="chatbot-modal" class="fixed inset-0 hidden items-center justify-center z-[9999]" style="background: rgba(0,0,0,0.6);">
+        <div class="bg-white rounded-xl w-[90%] max-w-[900px] h-[80%] relative overflow-hidden">
+            <button id="close-chat" class="absolute top-4 right-4 bg-[#5E8AB4] text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-[#4D7A94] transition-colors z-10">
+                <i class="fas fa-times"></i>
+            </button>
+            <iframe src="https://flo.host/vMB4_eq/" class="w-full h-full border-0"></iframe>
+        </div>
+    </div>
+
+    <!-- Google Translate Script -->
+    <script>
+        window.googleTranslateElementInit = function () {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                autoDisplay: false
+            }, 'google_translate_element');
+        };
+    </script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+        // Survey data in both languages
+        const surveyData = {
+            en: {
+                questions: [
+                    {
+                        id: 1,
+                        text: "How many times have you been to this museum?",
+                        type: "single",
+                        options: ["1st Time", "2–4", "5 or more"]
+                    },
+                    {
+                        id: 2,
+                        text: "Have you visited other locations that comes under Qatar Museums?",
+                        type: "single",
+                        options: ["Yes", "No"],
+                        followUp: {
+                            condition: "Yes",
+                            question: "Which other Qatar Museums locations did you visit?",
+                            type: "text"
+                        }
+                    },
+                    {
+                        id: 3,
+                        text: "Why did you visit the museum today?",
+                        type: "single",
+                        options: [
+                            "It was recommended to me",
+                            "I wanted to do something with family/friends",
+                            "Interested in a specific exhibition",
+                            "Interested in Qatari art/heritage",
+                            "I was in the area"
+                        ]
+                    },
+                    {
+                        id: 4,
+                        text: "What is your residency status currently?",
+                        type: "single",
+                        options: [
+                            "I am a citizen of Qatar",
+                            "I am a resident of Qatar",
+                            "I'm visiting Qatar as a tourist"
+                        ],
+                        followUp: {
+                            conditions: ["I am a resident of Qatar", "I'm visiting Qatar as a tourist"],
+                            question: "Where are you from? (Country name)",
+                            type: "text"
+                        }
+                    },
+                    {
+                        id: 5,
+                        text: "Who did you come with to the museum today?",
+                        type: "single",
+                        options: [
+                            "Alone",
+                            "With family",
+                            "With friends",
+                            "With a tour",
+                            "Other"
+                        ],
+                        followUp: {
+                            condition: "Other",
+                            question: "Please specify who you came with",
+                            type: "text"
+                        }
+                    },
+                    {
+                        id: 6,
+                        text: "How many were in your group today?",
+                        type: "single",
+                        options: ["Alone", "2–4", "5–10", "11+"]
+                    },
+                    {
+                        id: 7,
+                        text: "What are all the places you went to and the objects and services you used today? ⚠️[Please press enter when you're done selecting the appropriate option(s)]⚠️",
+                        type: "multiple",
+                        options: [
+                            "Permanent galleries",
+                            "Temporary exhibitions",
+                            "Audio tour",
+                            "Interactive Screens",
+                            "Guided tour",
+                            "Cafe/Restaurant",
+                            "Gift shop/s",
+                            "Library",
+                            "Playground",
+                            "Other"
+                        ],
+                        followUp: {
+                            condition: "Other",
+                            question: "Please specify other elements you engaged with",
+                            type: "text"
+                        }
+                    },
+                    {
+                        id: 8,
+                        text: "How long was your visit today?",
+                        type: "single",
+                        options: [
+                            "Less than 30 minutes",
+                            "30–60 minutes",
+                            "2 hours",
+                            "More than 3 hours"
+                        ]
+                    },
+                    {
+                        id: 9,
+                        text: "How would you rate your visit to the museum?",
+                        type: "rating",
+                        min: 1,
+                        max: 10
+                    },
+                    {
+                        id: 10,
+                        text: "Would you be willing to participate in future surveys for Qatar Museums?",
+                        type: "single",
+                        options: ["Yes", "No"],
+                        followUp: {
+                            condition: "Yes",
+                            question: "Please enter your name, email or phone number",
+                            type: "text"
+                        }
+                    },
+                    {
+                        id: 11,
+                        text: "Please share any other comments or feedback.",
+                        type: "text",
+                        placeholder: "Enter your comments here...",
+                        optional: true
+                    }
+                ],
+                prevText: "Previous",
+                nextText: "Next",
+                submitText: "Submit",
+                otherText: "Other",
+                selectAllText: "Select All",
+                followUpPlaceholder: "After typing your answer please press 'Enter'..."
+            },
+            ar: {
+                questions: [
+                    {
+                        id: 1,
+                        text: "كم مرة زرت هذا المتحف من قبل؟",
+                        type: "single",
+                        options: ["أول مرة", "2–4", "خمس أو أكثر"]
+                    },
+                    {
+                        id: 2,
+                        text: "هل قمت بزيارة مواقع متاحف قطر الأخرى؟",
+                        type: "single",
+                        options: ["نعم", "لا"],
+                        followUp: {
+                            condition: "نعم",
+                            question: "إذا نعم ، أي متحف أو موقع تابع لمتاحف قطر قمت بزيارته سابقاً",
+                            type: "text"
+                        }
+                    },
+                    {
+                        id: 3,
+                        text: "ما هو السبب الرئيسي لزيارتك اليوم؟",
+                        type: "single",
+                        options: [
+                            "تم نصحي بالزيارة",
+                            "أردت أن أقوم بعمل شيء ممتع مع الأهل والأصدقاء",
+                            "رغبت في زيارة معرض محدد",
+                            "أنا مهتم بالفن والثقافة القطرية",
+                            "كنت قريباً من المكان"
+                        ]
+                    },
+                    {
+                        id: 4,
+                        text: "ما الذي ينطبق عليك من الإختيارات أدناه؟",
+                        type: "single",
+                        options: [
+                            "أنا مواطن قطري",
+                            "أنا مقيم في قطر",
+                            "أنا زائر لدولة قطر"
+                        ],
+                        followUp: {
+                            conditions: ["أنا مقيم في قطر", "أنا زائر لدولة قطر"],
+                            question: "إذا كنت مقيم أو زائر لدولة قطر ، فمن أي بلد أنت ؟ يرجى إدخال اسم الدولة",
+                            type: "text"
+                        }
+                    },
+                    {
+                        id: 5,
+                        text: "مع من جئت إلى المتحف اليوم؟",
+                        type: "single",
+                        options: [
+                            "بنفسي",
+                            "مع عائلتي",
+                            "مع الأصدقاء",
+                            "مع جولة ارشادية",
+                            "أخرى"
+                        ],
+                        followUp: {
+                            condition: "أخرى",
+                            question: "يرجى تحديد من أتيت معه",
+                            type: "text"
+                        }
+                    },
+                    {
+                        id: 6,
+                        text: "كم عدد الأشخاص الذين برفقتك؟",
+                        type: "single",
+                        options: ["بنفسي", "2–4", "5–10", "أكثر من"]
+                    },
+                    {
+                        id: 7,
+                        text: "أي جزء من المتحف استخدمت أو زرت اليوم ، يمكنك اختيار أكثر من جواب؟",
+                        type: "multiple",
+                        options: [
+                            "المعارض الدائمة",
+                            "المعارض المؤقتة",
+                            "جولة سمعية",
+                            "الشاشات التفاعلية",
+                            "الجولات الإرشادية",
+                            "المقهى/المطعم",
+                            "متجر الهدايا",
+                            "المكتبة",
+                            "ساحة الألعاب",
+                            "أخرى"
+                        ],
+                        followUp: {
+                            condition: "أخرى",
+                            question: "يرجى تحديد الأجزاء الأخرى التي استخدمتها",
+                            type: "text"
+                        }
+                    },
+                    {
+                        id: 8,
+                        text: "تقريباً ماهي مدة زيارتك للمتحف؟",
+                        type: "single",
+                        options: [
+                            "أقل من نصف ساعة",
+                            "نصف ساعة إلى ساعة",
+                            "ساعتين",
+                            "أكثر من ثلاث ساعات"
+                        ]
+                    },
+                    {
+                        id: 9,
+                        text: "كيف تقيّم زيارتك للمتحف اليوم؟",
+                        type: "rating",
+                        min: 1,
+                        max: 10
+                    },
+                    {
+                        id: 10,
+                        text: "هل ترغب بالمشاركة في المزيد من استطلاعات الرأي الخاصة بمتاحف قطر؟",
+                        type: "single",
+                        options: ["نعم", "لا"],
+                        followUp: {
+                            condition: "نعم",
+                            question: "الرجاء إدخال اسمك، بريدك الإلكتروني أو رقم هاتفك",
+                            type: "text"
+                        }
+                    },
+                    {
+                        id: 11,
+                        text: "هل هناك أية تعليقات ترغب في مشاركتها معنا؟",
+                        type: "text",
+                        placeholder: "أدخل تعليقاتك هنا...",
+                        optional: true
+                    }
+                ],
+                prevText: "السابق",
+                nextText: "التالي",
+                submitText: "إرسال",
+                otherText: "أخرى",
+                selectAllText: "اختر الكل",
+                followUpPlaceholder: "الرجاء إدخال إجابتك..."
+            }
+        };
+        
+        // State management
+        let currentLanguage = 'en';
+        let currentQuestionIndex = 0;
+        let answers = {};
+        let score = 0;
+        let showFollowUp = false;
+        let followUpAnswer = '';
+        let surveyKeydownHandler = null;
+        
+        // DOM elements
+        const surveyContainer = document.getElementById('survey-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const scoreElement = document.getElementById('score');
+        const progressText = document.getElementById('progress-text');
+        const progressPercent = document.getElementById('progress-percent');
+        const progressFill = document.getElementById('progress-fill');
+        const prevText = document.getElementById('prev-text');
+        
+        // Initialize the survey
+        function initSurvey() {
+            showLanguageScreen();
+            
+            document.getElementById('select-english').addEventListener('click', function() {
+                currentLanguage = 'en';
+                document.body.classList.remove('rtl');
+                localStorage.setItem('surveyLanguage', 'en');
+                currentQuestionIndex = 0;
+                loadQuestion(currentQuestionIndex);
+                updateProgress();
+                updateNavigationText();
+            });
+
+            document.getElementById('select-arabic').addEventListener('click', function() {
+                currentLanguage = 'ar';
+                document.body.classList.add('rtl');
+                localStorage.setItem('surveyLanguage', 'ar');
+                currentQuestionIndex = 0;
+                loadQuestion(currentQuestionIndex);
+                updateProgress();
+                updateNavigationText();
+            });
+        }
+        
+        // Show language selection screen
+        function showLanguageScreen() {
+            document.getElementById('language-screen').style.display = 'flex';
+            document.getElementById('survey-container').style.display = 'none';
+            prevBtn.style.visibility = 'hidden';
+        }
+        
+        // Load a question based on index
+        function loadQuestion(index) {
+            const questions = surveyData[currentLanguage].questions;
+            
+            document.getElementById('language-screen').style.display = 'none';
+            document.getElementById('survey-container').style.display = 'block';
+            prevBtn.style.visibility = 'visible';
+            
+            // Check if we should show a follow-up question
+            showFollowUp = false;
+            const currentAnswer = answers[questions[index].id];
+            
+            if (questions[index].followUp && currentAnswer) {
+                if (questions[index].followUp.conditions) {
+                    if (questions[index].followUp.conditions.includes(currentAnswer)) {
+                        showFollowUp = true;
+                    }
+                } else if (questions[index].followUp.condition === currentAnswer) {
+                    showFollowUp = true;
+                }
+            }
+            
+            // Create question HTML
+            let questionHTML = '';
+            const question = questions[index];
+            
+            questionHTML += `<h2 class="text-xl font-bold mb-6 ${currentLanguage === 'ar' ? 'text-right' : 'text-left'}">${question.text}</h2>`;
+            
+            if (question.type === 'single') {
+                if (question.options.length === 2) {
+                    questionHTML += `<div class="flex ${currentLanguage === 'ar' ? 'flex-row-reverse' : ''} gap-4 mb-4">`;
+                    question.options.forEach(option => {
+                        const isSelected = answers[question.id] === option;
+                        questionHTML += `
+                            <button class="option-btn flex-1 p-4 rounded-lg bg-white border border-gray-200 text-center ${isSelected ? 'selected' : ''} ${currentLanguage === 'ar' ? 'text-right' : 'text-left'}" 
+                                    data-value="${option}">
+                                ${option}
+                                ${isSelected ? '<i class="fas fa-check ml-2"></i>' : ''}
+                            </button>
+                        `;
+                    });
+                    questionHTML += `</div>`;
+                } else {
+                    question.options.forEach(option => {
+                        const isSelected = answers[question.id] === option;
+                        questionHTML += `
+                            <button class="option-btn w-full mb-3 p-4 rounded-lg bg-white border border-gray-200 text-left ${isSelected ? 'selected' : ''} ${currentLanguage === 'ar' ? 'text-right' : 'text-left'}" 
+                                    data-value="${option}">
+                                ${option}
+                                ${isSelected ? '<i class="fas fa-check ml-2 float-right"></i>' : ''}
+                            </button>
+                        `;
+                    });
+                }
+            } 
+            else if (question.type === 'multiple') {
+                const selectedOptions = answers[question.id] || [];
+                question.options.forEach(option => {
+                    const isSelected = selectedOptions.includes(option);
+                    questionHTML += `
+                        <div class="flex items-center mb-3 p-3 rounded-lg bg-white border border-gray-200 ${currentLanguage === 'ar' ? 'flex-row-reverse' : ''}">
+                            <input type="checkbox" id="option-${option}" class="mr-3 ${currentLanguage === 'ar' ? 'ml-3 mr-0' : ''}" 
+                                   value="${option}" ${isSelected ? 'checked' : ''}>
+                            <label for="option-${option}" class="flex-1">${option}</label>
+                        </div>
+                    `;
+                });
+                
+                questionHTML += `
+                    <button id="select-all-btn" class="mt-2 text-sm text-[#5EBAB4] font-medium ${currentLanguage === 'ar' ? 'float-left' : 'float-right'}">
+                        ${surveyData[currentLanguage].selectAllText}
+                    </button>
+                    <div class="clear-both"></div>
+                `;
+            } 
+            else if (question.type === 'rating') {
+                questionHTML += `<div class="flex justify-between mb-6 ${currentLanguage === 'ar' ? 'flex-row-reverse' : ''}">`;
+                for (let i = question.min; i <= question.max; i++) {
+                    const isSelected = answers[question.id] === i;
+                    questionHTML += `
+                        <button class="rating-btn rounded-full flex items-center justify-center ${isSelected ? 'selected' : 'bg-gray-100'}" 
+                                data-value="${i}">
+                            ${i}
+                        </button>
+                    `;
+                }
+                questionHTML += `</div>`;
+            } 
+            else if (question.type === 'text') {
+                questionHTML += `
+                    <div class="relative mt-6">
+                        <input type="text" id="text-answer" class="input-field w-full p-4 rounded-lg" 
+                               placeholder="${question.placeholder || ''}" 
+                               value="${answers[question.id] || ''}">
+                    </div>
+                `;
+            }
+            
+            // Add follow-up question if needed
+            if (showFollowUp) {
+                questionHTML += `
+                    <div class="mt-6">
+                        <h3 class="text-lg font-medium mb-3 ${currentLanguage === 'ar' ? 'text-right' : 'text-left'}">${question.followUp.question}</h3>
+                        <div class="relative">
+                            <input type="text" id="follow-up-answer" class="input-field w-full p-4 rounded-lg" 
+                                   placeholder="${surveyData[currentLanguage].followUpPlaceholder}" 
+                                   value="${followUpAnswer || ''}">
+                        </div>
+                    </div>
+                `;
+            }
+            
+            surveyContainer.innerHTML = questionHTML;
+            addQuestionEventListeners();
+        }
+        
+        // Add event listeners for question interactions
+        function addQuestionEventListeners() {
+            const questions = surveyData[currentLanguage].questions;
+            const question = questions[currentQuestionIndex];
+            
+            if (surveyKeydownHandler) {
+                document.removeEventListener('keydown', surveyKeydownHandler);
+                surveyKeydownHandler = null;
+            }
+            
+            surveyKeydownHandler = function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (question.type === 'text') {
+                        const input = document.getElementById('text-answer');
+                        if (input) {
+                            answers[question.id] = input.value;
+                            if (!question.answered && input.value.trim() !== '') {
+                                addPoints(10);
+                                question.answered = true;
+                            }
+                        }
+                        goToNextQuestion();
+                        return;
+                    }
+                    
+                    const followEl = document.getElementById('follow-up-answer');
+                    if (showFollowUp && followEl) {
+                        followUpAnswer = followEl.value;
+                        goToNextQuestion();
+                        return;
+                    }
+                    
+                    if (question.type === 'multiple') {
+                        goToNextQuestion();
+                        return;
+                    }
+                }
+            };
+            document.addEventListener('keydown', surveyKeydownHandler);
+            
+            // Single choice buttons
+            if (question.type === 'single') {
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('.option-btn').forEach(b => {
+                            b.classList.remove('selected');
+                            const icon = b.querySelector('i');
+                            if (icon) icon.remove();
+                        });
+                        
+                        const value = this.getAttribute('data-value');
+                        answers[question.id] = value;
+                        
+                        this.classList.add('selected');
+                        this.innerHTML += '<i class="fas fa-check ml-2 float-right"></i>';
+                        
+                        if (question.id === 2) {
+                            if (value === question.options[0]) {
+                                showFollowUp = false;
+                                followUpAnswer = '';
+                            } else {
+                                showFollowUp = true;
+                            }
+                        } else if (question.followUp) {
+                            if (question.followUp.conditions) {
+                                showFollowUp = question.followUp.conditions.includes(value);
+                            } else {
+                                showFollowUp = question.followUp.condition === value;
+                            }
+                        } else {
+                            showFollowUp = false;
+                        }
+                        
+                        if (!question.answered) {
+                            addPoints(10);
+                            question.answered = true;
+                        }
+                        
+                        loadQuestion(currentQuestionIndex);
+                        
+                        let shouldAutoAdvance = false;
+                        
+                        if (!showFollowUp) {
+                            shouldAutoAdvance = true;
+                        }
+                        
+                        if (question.id === 4) {
+                            if (value === question.options[0]) shouldAutoAdvance = true;
+                            else shouldAutoAdvance = false;
+                        }
+                        
+                        if (question.id === 5) {
+                            if (value === question.followUp.condition) shouldAutoAdvance = false;
+                            else shouldAutoAdvance = true;
+                        }
+                        
+                        if (question.id === 10) {
+                            if (value === question.options[1]) shouldAutoAdvance = true;
+                            else shouldAutoAdvance = false;
+                        }
+                        
+                        if (shouldAutoAdvance) {
+                            setTimeout(() => goToNextQuestion(), 220);
+                        }
+                    });
+                });
+            }
+            
+            // Multiple choice checkboxes
+            if (question.type === 'multiple') {
+                document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        const value = this.value;
+                        answers[question.id] = answers[question.id] || [];
+                        
+                        if (this.checked) {
+                            if (!answers[question.id].includes(value)) {
+                                answers[question.id].push(value);
+                            }
+                        } else {
+                            const index = answers[question.id].indexOf(value);
+                            if (index > -1) {
+                                answers[question.id].splice(index, 1);
+                            }
+                        }
+                        
+                        if (question.followUp && question.followUp.condition === value && this.checked) {
+                            showFollowUp = true;
+                            loadQuestion(currentQuestionIndex);
+                        } else if (question.followUp && question.followUp.condition === value && !this.checked) {
+                            showFollowUp = false;
+                            loadQuestion(currentQuestionIndex);
+                        }
+                        
+                        if (!question.answered && answers[question.id].length > 0) {
+                            addPoints(10);
+                            question.answered = true;
+                        }
+                    });
+                });
+                
+                document.getElementById('select-all-btn').addEventListener('click', function() {
+                    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                    
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = !allChecked;
+                        checkbox.dispatchEvent(new Event('change'));
+                    });
+                });
+            }
+            
+            // Rating buttons
+            if (question.type === 'rating') {
+                document.querySelectorAll('.rating-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('.rating-btn').forEach(b => {
+                            b.classList.remove('selected');
+                            b.classList.add('bg-gray-100');
+                        });
+                        
+                        this.classList.add('selected');
+                        this.classList.remove('bg-gray-100');
+                        
+                        const value = parseInt(this.getAttribute('data-value'));
+                        answers[question.id] = value;
+                        
+                        if (!question.answered) {
+                            addPoints(10);
+                            question.answered = true;
+                        }
+                        
+                        setTimeout(() => goToNextQuestion(), 220);
+                    });
+                });
+            }
+            
+            // Text input
+            if (question.type === 'text') {
+                const textEl = document.getElementById('text-answer');
+                textEl.addEventListener('input', function() {
+                    answers[question.id] = this.value;
+                    
+                    if (!question.answered && this.value.trim() !== '') {
+                        addPoints(10);
+                        question.answered = true;
+                    }
+                });
+            }
+            
+            // Follow-up input
+            if (showFollowUp && document.getElementById('follow-up-answer')) {
+                const fuEl = document.getElementById('follow-up-answer');
+                fuEl.addEventListener('input', function() {
+                    followUpAnswer = this.value;
+                });
+            }
+        }
+        
+        // Navigation functions
+        function goToNextQuestion() {
+            const questions = surveyData[currentLanguage].questions;
+            
+            if (!validateCurrentQuestion()) {
+                return;
+            }
+            
+            if (showFollowUp && followUpAnswer) {
+                const question = questions[currentQuestionIndex];
+                answers[`${question.id}_followup`] = followUpAnswer;
+            }
+            
+            if (currentQuestionIndex === questions.length - 1) {
+                submitSurvey();
+                return;
+            }
+            
+            currentQuestionIndex++;
+            loadQuestion(currentQuestionIndex);
+            updateProgress();
+        }
+        
+        function goToPrevQuestion() {
+            if (currentQuestionIndex === 0) {
+                showLanguageScreen();
+                prevBtn.style.visibility = 'hidden';
+            } else {
+                currentQuestionIndex--;
+                loadQuestion(currentQuestionIndex);
+                updateProgress();
+            }
+        }
+        
+        // Validate current question before proceeding
+        function validateCurrentQuestion() {
+            const questions = surveyData[currentLanguage].questions;
+            const question = questions[currentQuestionIndex];
+            
+            if (question.optional) {
+                if (showFollowUp && (!followUpAnswer || followUpAnswer.trim() === '')) {
+                    alert(currentLanguage === 'en' ? 'Please answer the follow-up question.' : 'الرجاء الإجابة على سؤال المتابعة.');
+                    return false;
+                }
+                return true;
+            }
+            
+            if (!answers[question.id] && question.type !== 'multiple') {
+                alert(currentLanguage === 'en' ? 'Please answer this question before proceeding.' : 'الرجاء الإجابة على هذا السؤال قبل المتابعة.');
+                return false;
+            }
+            
+            if (question.type === 'multiple' && (!answers[question.id] || answers[question.id].length === 0)) {
+                alert(currentLanguage === 'en' ? 'Please select at least one option.' : 'الرجاء اختيار خيار واحد على الأقل.');
+                return false;
+            }
+            
+            if (showFollowUp && (!followUpAnswer || followUpAnswer.trim() === '')) {
+                alert(currentLanguage === 'en' ? 'Please answer the follow-up question.' : 'الرجاء الإجابة على سؤال المتابعة.');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Generate unique feedback ID
+        function genFeedbackId() {
+            return "fb-" + new Date().toISOString().replace(/[-:.TZ]/g, "") +
+                   "-" + Math.random().toString(36).slice(2,7);
+        }
+
+        // Submit the survey
+        function submitSurvey() {
+            // Show loading state
+            surveyContainer.classList.add('loading');
+            
+            const payload = {
+                feedback_id: genFeedbackId(),
+                timestamp: new Date().toISOString(),
+                language: currentLanguage || "en",
+                score: score || 0,
+                q1: answers?.[1] || "",
+                q2: answers?.[2] || "",
+                q3: answers?.[3] || "",
+                q4: answers?.[4] || "",
+                q5: answers?.[5] || "",
+                q6: answers?.[6] || "",
+                q7: Array.isArray(answers?.[7]) ? answers[7] : (answers?.[7] || ""),
+                q8: answers?.[8] || "",
+                q9: answers?.[9] || "",
+                q10: answers?.[10] || "",
+                q11: answers?.[11] || "",
+                q2_followup: answers?.['2_followup'] || "",
+                q4_followup: answers?.['4_followup'] || "",
+                q5_followup: answers?.['5_followup'] || "",
+                q7_followup: answers?.['7_followup'] || "",
+                q10_followup: answers?.['10_followup'] || "",
+                user_agent: navigator.userAgent,
+                page_url: location.href,
+                tz_offset_min: new Date().getTimezoneOffset()
+            };
+
+            fetch("/.netlify/functions/submitSurvey", {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log("Submission successful", data);
+                showSuccessMessage();
+            })
+            .catch(err => {
+                console.error("Submission error:", err);
+                showErrorMessage();
+            })
+            .finally(() => {
+                surveyContainer.classList.remove('loading');
+            });
+        }
+
+        function showSuccessMessage() {
+            surveyContainer.innerHTML = `
+                <div class="text-center py-10">
+                    <i class="fas fa-check-circle text-6xl text-green-500 mb-4"></i>
+                    <h2 class="text-2xl font-bold mb-2">${currentLanguage === 'en' ? 'Thank you!' : 'شكراً لك!'}</h2>
+                    <p class="text-gray-600 mb-6">${currentLanguage === 'en' ? 'Your feedback is valuable to us.' : 'ملاحظاتك قيمة بالنسبة لنا.'}</p>
+                    <p class="text-gray-600">${currentLanguage === 'en' ? 'You earned' : 'لقد ربحت'} <span class="font-bold text-[#5E8AB4]">${score} ${currentLanguage === 'en' ? 'points' : 'نقطة'}</span>!</p>
+                </div>
+            `;
+            prevBtn.style.display = 'none';
+            triggerConfetti();
+        }
+
+        function showErrorMessage() {
+            surveyContainer.innerHTML = `
+                <div class="text-center py-10">
+                    <i class="fas fa-exclamation-triangle text-6xl text-red-500 mb-4"></i>
+                    <h2 class="text-2xl font-bold mb-2 text-red-600">${currentLanguage === 'en' ? 'Submission Failed' : 'فشل في الإرسال'}</h2>
+                    <p class="text-gray-600 mb-6">${currentLanguage === 'en' ? 'There was an error submitting your survey. Please try again.' : 'حدث خطأ في إرسال الاستبيان. يرجى المحاولة مرة أخرى.'}</p>
+                    <button onclick="location.reload()" class="px-6 py-2 bg-[#5E8AB4] text-white rounded-lg hover:bg-[#4D7A94] transition">
+                        ${currentLanguage === 'en' ? 'Try Again' : 'حاول مرة أخرى'}
+                    </button>
+                </div>
+            `;
+        }
+        
+        function updateNavigationText() {
+            prevText.textContent = surveyData[currentLanguage].prevText;
+        }
+        
+        // Progress tracking
+        function updateProgress() {
+            const questions = surveyData[currentLanguage].questions;
+            const totalQuestions = questions.length;
+            const percent = Math.round((currentQuestionIndex / (totalQuestions - 1)) * 100);
+            
+            progressText.textContent = currentLanguage === 'en' ? 
+                `Question ${currentQuestionIndex + 1} of ${totalQuestions}` : 
+                `السؤال ${currentQuestionIndex + 1} من ${totalQuestions}`;
+                
+            progressPercent.textContent = `${percent}%`;
+            progressFill.style.width = `${percent}%`;
+        }
+        
+        // Points system
+        function addPoints(points) {
+            score += points;
+            updateScoreDisplay();
+        }
+        
+        function updateScoreDisplay() {
+            scoreElement.textContent = score;
+        }
+        
+        // Confetti effect
+        function triggerConfetti() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#5E8AB4', '#4D7A94', '#7EB9D3']
+            });
+        }
+        
+        // Event listeners
+        prevBtn.addEventListener('click', goToPrevQuestion);
+        
+        // Chatbot functionality
+        document.getElementById('botpress-btn').addEventListener('click', function() {
+            document.getElementById('chatbot-modal').classList.remove('hidden');
+            document.getElementById('chatbot-modal').classList.add('flex');
+        });
+
+        document.getElementById('close-chat').addEventListener('click', function() {
+            document.getElementById('chatbot-modal').classList.remove('flex');
+            document.getElementById('chatbot-modal').classList.add('hidden');
+        });
+
+        document.getElementById('chatbot-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                document.getElementById('chatbot-modal').classList.remove('flex');
+                document.getElementById('chatbot-modal').classList.add('hidden');
+            }
+        });
+        
+        // Initialize the survey
+        initSurvey();
+    </script>
+
+</body>
+</html>
