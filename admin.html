@@ -263,25 +263,75 @@
 
         // Dashboard Data Loading
         async function loadDashboardData() {
-            try {
-                // This would require an additional endpoint to get stats
-                // For now, we'll show placeholder data
-                document.getElementById('total-responses').textContent = 'Loading...';
-                document.getElementById('english-responses').textContent = 'Loading...';
-                document.getElementById('arabic-responses').textContent = 'Loading...';
-
-                // Load recent submissions table
-                loadRecentSubmissions();
-
-            } catch (error) {
-                console.error('Error loading dashboard data:', error);
-            }
+    try {
+        const response = await fetch(`/.netlify/functions/getStats?password=${adminPassword}`);
+        
+        if (!response.ok) {
+            throw new Error('Failed to load stats');
         }
 
-        async function loadRecentSubmissions() {
-            const tbody = document.getElementById('submissions-table');
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-500">No recent submissions data available via current API</td></tr>';
-        }
+        const data = await response.json();
+        
+        document.getElementById('total-responses').textContent = data.stats.total;
+        document.getElementById('english-responses').textContent = data.stats.english;
+        document.getElementById('arabic-responses').textContent = data.stats.arabic;
+
+        loadRecentSubmissions(data.recentSubmissions);
+
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        document.getElementById('total-responses').textContent = 'Error';
+        document.getElementById('english-responses').textContent = 'Error';
+        document.getElementById('arabic-responses').textContent = 'Error';
+    }
+}
+
+        function loadRecentSubmissions(submissions) {
+    const tbody = document.getElementById('submissions-table');
+    
+    if (!submissions || submissions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-500">No recent submissions found</td></tr>';
+        return;
+    }
+
+    const rows = submissions.map(submission => {
+        const date = new Date(submission.timestamp || submission.created_at).toLocaleDateString('en-GB');
+        const time = new Date(submission.timestamp || submission.created_at).toLocaleTimeString('en-GB', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        return `
+            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                <td class="py-3 px-2">
+                    <div class="text-sm font-medium">${date}</div>
+                    <div class="text-xs text-gray-500">${time}</div>
+                </td>
+                <td class="py-3 px-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        submission.language === 'en' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                    }">
+                        ${submission.language === 'en' ? 'English' : 'العربية'}
+                    </span>
+                </td>
+                <td class="py-3 px-2">
+                    <span class="text-sm font-semibold">${submission.score || 0}</span>
+                </td>
+                <td class="py-3 px-2">
+                    <div class="text-sm text-gray-900 max-w-xs truncate">${submission.q3 || 'N/A'}</div>
+                </td>
+                <td class="py-3 px-2">
+                    <div class="flex items-center">
+                        <span class="text-sm font-medium">${submission.q9 || 'N/A'}</span>
+                        ${submission.q9 ? '<span class="text-xs text-gray-500 ml-1">/10</span>' : ''}
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    tbody.innerHTML = rows;
+}
 
         // Export Functions
         document.getElementById('export-all').addEventListener('click', () => exportData());
